@@ -3,11 +3,19 @@ import { AuthGoogleContext } from "../../contexts/authGoogle";
 import { Button, Box, Typography, useTheme } from "@mui/material";
 import { Google as GoogleIcon } from "@mui/icons-material";
 import logo from "../../assets/logo.png";
+import listQuestions from "../../hooks/questions";
 
-export const Home = () => {
+const Home = () => {
   const { user, signOut } = useContext(AuthGoogleContext);
   const userLoggedIn = JSON.parse(user);
   const theme = useTheme();
+
+  const { questions } = listQuestions();
+
+  console.log(questions);
+  if (!questions) {
+    return <Typography>Loading</Typography>;
+  }
 
   return (
     <Box
@@ -22,15 +30,11 @@ export const Home = () => {
       <Typography color={theme.palette.primary.main} variant="h4">
         Welcome, {userLoggedIn.displayName}!
       </Typography>
-      <Button
-        onClick={signOut}
-        variant="contained"
-        startIcon={<GoogleIcon />}
-        size="large"
-        sx={{ marginTop: 4 }}
-      >
-        Sign Out
-      </Button>
+      {questions.map((question) => (
+        <Typography>{question.data.statement}</Typography>
+      ))}
     </Box>
   );
 };
+
+export default Home;

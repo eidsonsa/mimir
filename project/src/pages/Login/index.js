@@ -5,7 +5,7 @@ import { Button, Box } from "@mui/material";
 import { Google as GoogleIcon } from "@mui/icons-material";
 import logo from "../../assets/logo.png";
 
-export const Login = () => {
+const Login = () => {
   const { signInGoogle, isLoggedIn } = useContext(AuthGoogleContext);
 
   const loginGoogle = async () => {
@@ -37,3 +37,5 @@ export const Login = () => {
     </Box>
   );
 };
+
+export default Login;
