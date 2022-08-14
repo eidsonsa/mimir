@@ -1,18 +1,28 @@
 import React, { useContext } from "react";
 import { AuthGoogleContext } from "../../contexts/authGoogle";
-import { Button, Box, Typography, useTheme } from "@mui/material";
-import { Google as GoogleIcon } from "@mui/icons-material";
-import logo from "../../assets/logo.png";
-import listQuestions from "../../hooks/questions";
+import {
+  Box,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import useQuestions from "../../hooks/useQuestions";
+import { ArrowForward } from "@mui/icons-material";
+import { useNavigate } from "react-router";
 
 const Home = () => {
-  const { user, signOut } = useContext(AuthGoogleContext);
+  const { user } = useContext(AuthGoogleContext);
   const userLoggedIn = JSON.parse(user);
   const theme = useTheme();
 
-  const { questions } = listQuestions();
+  const { questions } = useQuestions();
+  const navigate = useNavigate();
 
-  console.log(questions);
   if (!questions) {
     return <Typography>Loading</Typography>;
   }
@@ -24,15 +34,50 @@ const Home = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        marginX: 2,
       }}
     >
-      <Box component="img" src={logo} sx={{ height: 200 }} />
       <Typography color={theme.palette.primary.main} variant="h4">
         Welcome, {userLoggedIn.displayName}!
       </Typography>
-      {questions.map((question) => (
-        <Typography>{question.data.statement}</Typography>
-      ))}
+      <Box
+        sx={{ display: "flex", width: "100%", justifyContent: "space-between" }}
+      >
+        <Box sx={{ display: "flex", flex: 1 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Title</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {questions.map((question) => (
+                <TableRow key={question.id}>
+                  <TableCell>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography>{question.data.title}</Typography>
+                      <IconButton
+                        onClick={() => navigate(`/question/${question.id}`)}
+                      >
+                        <ArrowForward />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+        <Box sx={{ display: "flex", flex: 1 }}>
+          <Typography>Tests</Typography>
+        </Box>
+      </Box>
     </Box>
   );
 };

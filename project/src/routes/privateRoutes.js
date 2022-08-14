@@ -1,4 +1,3 @@
-import { useTheme } from "@emotion/react";
 import {
   Create,
   HomeOutlined,
@@ -8,7 +7,6 @@ import {
 import {
   AppBar,
   Avatar,
-  Button,
   Drawer,
   IconButton,
   ListItem,
@@ -20,7 +18,7 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useContext, useState } from "react";
-import { Navigate, Outlet, useNavigate } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import whiteLogo from "../assets/white-logo.jpg";
 import { AuthGoogleContext } from "../contexts/authGoogle";
 
@@ -28,7 +26,6 @@ export const PrivateRoutes = () => {
   const { user, signOut } = useContext(AuthGoogleContext);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const theme = useTheme();
 
   if (!user) {
     return;
@@ -72,7 +69,12 @@ export const PrivateRoutes = () => {
               >
                 <MenuOutlined />
               </IconButton>
-              <Box component="img" src={whiteLogo} sx={{ height: 70 }} />
+              <Box
+                component="img"
+                src={whiteLogo}
+                sx={{ height: 70, cursor: "pointer" }}
+                onClick={() => navigate("/")}
+              />
             </Box>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Typography paddingRight={4}>
@@ -95,7 +97,7 @@ export const PrivateRoutes = () => {
         >
           {navigationItems.map((item) => {
             return (
-              <ListItem disablePadding>
+              <ListItem disablePadding key={item.text}>
                 <ListItemButton
                   onClick={() => {
                     item.href();
