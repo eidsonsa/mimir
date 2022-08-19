@@ -4,6 +4,7 @@ import { AuthGoogleContext } from "../../contexts/authGoogle";
 import { Button, Box } from "@mui/material";
 import { Google as GoogleIcon } from "@mui/icons-material";
 import logo from "../../assets/logo.png";
+import PageContainer from "../../components/PageContainer";
 
 const Login = () => {
   const { signInGoogle, isLoggedIn } = useContext(AuthGoogleContext);
@@ -17,14 +18,7 @@ const Login = () => {
   }
 
   return (
-    <Box
-      sx={{
-        marginTop: 8,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
+    <PageContainer>
       <Box component="img" src={logo} sx={{ height: 200 }} />
       <Button
         onClick={loginGoogle}
@@ -34,7 +28,7 @@ const Login = () => {
       >
         Sign In With Google
       </Button>
-    </Box>
+    </PageContainer>
   );
 };
 

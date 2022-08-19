@@ -3,23 +3,23 @@ import { useEffect, useState } from "react";
 
 import { db } from "../services/firebaseConfig";
 
-export default function useGetQuestion(questionId) {
-  const [question, setQuestion] = useState();
+export default function useGetTest(testId) {
+  const [test, setTest] = useState();
 
   useEffect(() => {
-    getQuestion();
+    getTest();
   }, []);
 
-  function getQuestion() {
-    const docRef = doc(db, "questions", questionId);
+  function getTest() {
+    const docRef = doc(db, "tests", testId);
     getDoc(docRef)
       .then((response) => {
         if (response.exists()) {
-          setQuestion(response.data());
+          setTest(response.data());
         }
       })
       .catch((error) => console.log(error.message));
   }
 
-  return { question };
+  return { test };
 }

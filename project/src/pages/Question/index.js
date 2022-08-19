@@ -13,6 +13,8 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import html2canvas from "html2canvas";
 import { ExpandMoreOutlined } from "@mui/icons-material";
 import { nord } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import PageContainer from "../../components/PageContainer";
+
 const Question = () => {
   const theme = useTheme();
 
@@ -41,19 +43,10 @@ const Question = () => {
   }
 
   return (
-    <Box
-      sx={{
-        marginTop: 8,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        marginX: 2,
-      }}
-    >
+    <PageContainer>
       <Typography color={theme.palette.primary.main} variant="h4">
         {question.title}
       </Typography>
-      <Box></Box>
       <Box component="img" src={codeImage} />
       <div id="code-image">
         <SyntaxHighlighter language={question.syntaxHighlighting} style={nord}>
@@ -84,7 +77,7 @@ const Question = () => {
           </Typography>
         </AccordionDetails>
       </Accordion>
-    </Box>
+    </PageContainer>
   );
 };
 

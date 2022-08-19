@@ -3,6 +3,7 @@ import {
   HomeOutlined,
   MenuOutlined,
   Google,
+  Assignment,
 } from "@mui/icons-material";
 import {
   AppBar,
@@ -42,6 +43,11 @@ export const PrivateRoutes = () => {
       text: "Create Question",
       href: () => navigate("/create-question"),
       icon: <Create />,
+    },
+    {
+      text: "Create Test",
+      href: () => navigate("/create-test"),
+      icon: <Assignment />,
     },
     {
       text: "Sign out",

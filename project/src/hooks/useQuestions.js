@@ -39,17 +39,5 @@ export default function useQuestions() {
       .catch((error) => console.error(error.message));
   }
 
-  function getQuestion(questionId) {
-    const docRef = doc(db, "questions", questionId);
-    // const docSnap = await getDoc(docRef);
-    // console.log(docSnap.exists())
-    getDoc(docRef)
-      .then((response) => {
-        const res = response.data();
-        return res;
-      })
-      .catch((error) => console.log(error.message));
-  }
-
-  return { questions, addQuestion, getQuestion };
+  return { questions, addQuestion };
 }

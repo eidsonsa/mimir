@@ -11,29 +11,42 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Chip,
 } from "@mui/material";
 import { Formik } from "formik";
-import useQuestions from "../../hooks/useQuestions";
 import { useNavigate } from "react-router";
+import useTests from "../../hooks/useTests";
+import useQuestions from "../../hooks/useQuestions";
 import PageContainer from "../../components/PageContainer";
 
-const CreateQuestion = () => {
+const CreateTest = () => {
   const theme = useTheme();
-  const { addQuestion } = useQuestions();
+  const { addTest } = useTests();
+  const { questions: questionsData } = useQuestions();
   const navigate = useNavigate();
+
+  if (!questionsData) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  const questions = questionsData.map((question) => question.id);
 
   const initialValues = {
     title: "",
-    code: "",
-    statement: "",
-    expectedAnswer: "",
-    isPrivate: false,
-    syntaxHighlighting: "",
+    instructionsPage: "",
+    demographicQuestions: [],
+    questions: [],
+    showExpectedAnswer: false,
   };
 
-  const onCreateQuestion = (values) => {
+  const onCreateTest = (values) => {
     try {
-      addQuestion(values);
+      const demographicArrayQuestions = values.demographicQuestions.split("\n");
+      const newValues = {
+        ...values,
+        demographicQuestions: demographicArrayQuestions,
+      };
+      addTest(newValues);
       navigate("/");
     } catch (e) {
       console.error(e.message);
@@ -43,7 +56,7 @@ const CreateQuestion = () => {
   return (
     <PageContainer>
       <Typography color={theme.palette.primary.main} variant="h4">
-        Create Question
+        Create Test
       </Typography>
       <Box
         sx={{
@@ -53,8 +66,8 @@ const CreateQuestion = () => {
           flexDirection: "column",
         }}
       >
-        <Formik initialValues={initialValues} onSubmit={onCreateQuestion}>
-          {({ handleChange, handleSubmit, setFieldValue }) => (
+        <Formik initialValues={initialValues} onSubmit={onCreateTest}>
+          {({ handleChange, handleSubmit, setFieldValue, values }) => (
             <>
               <TextField
                 label="Title"
@@ -65,73 +78,61 @@ const CreateQuestion = () => {
                 onChange={handleChange}
               />
               <TextField
-                label="Code"
+                label="Instructions page"
                 variant="outlined"
                 multiline
                 minRows={10}
                 maxRows={10}
                 fullWidth
                 sx={{ marginY: 1 }}
-                name="code"
-                onChange={handleChange}
-                onKeyDown={(e) => {
-                  const { value } = e.target;
-
-                  if (e.key === "Tab") {
-                    e.preventDefault();
-
-                    const cursorPosition = e.target.selectionStart;
-                    const cursorEndPosition = e.target.selectionEnd;
-                    const tab = "\t";
-
-                    e.target.value =
-                      value.substring(0, cursorPosition) +
-                      tab +
-                      value.substring(cursorEndPosition);
-
-                    e.target.selectionStart = cursorPosition + 1;
-                    e.target.selectionEnd = cursorPosition + 1;
-                  }
-                }}
-              />
-              <TextField
-                label="Statement"
-                variant="outlined"
-                fullWidth
-                sx={{ marginY: 1 }}
-                name="statement"
+                name="instructionsPage"
                 onChange={handleChange}
               />
               <TextField
-                label="Expected Answer"
+                label="Demographic Questions"
                 variant="outlined"
+                multiline
+                minRows={5}
+                maxRows={5}
                 fullWidth
                 sx={{ marginY: 1 }}
-                name="expectedAnswer"
+                name="demographicQuestions"
+                placeholder="Type 1 question on each line"
                 onChange={handleChange}
               />
               <FormControl sx={{ marginY: 1 }}>
-                <InputLabel>Syntax Highlighting</InputLabel>
+                <InputLabel>Questions</InputLabel>
                 <Select
-                  label="Syntax Highlighting"
+                  label="Questions"
                   onChange={(event) =>
-                    setFieldValue("syntaxHighlighting", event.target.value)
+                    setFieldValue("questions", event.target.value)
                   }
+                  multiple
+                  value={values.questions}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                      {selected.map((value) => (
+                        <Chip key={value} label={value} />
+                      ))}
+                    </Box>
+                  )}
                 >
-                  <MenuItem value="">None</MenuItem>
-                  <MenuItem value="python">Python</MenuItem>
-                  <MenuItem value="javascript">Javascript</MenuItem>
+                  {questions.map((question) => (
+                    <MenuItem value={question} key={question}>
+                      {question}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
               <FormControlLabel
                 control={
                   <Switch
                     onChange={(event) =>
-                      setFieldValue("isPrivate", event.target.checked)
+                      setFieldValue("showExpectedAnswer", event.target.checked)
                     }
                   />
                 }
-                label="Is Private"
+                label="Show Expected Answer"
               />
               <Button
                 onClick={handleSubmit}
@@ -148,4 +149,4 @@ const CreateQuestion = () => {
   );
 };
 
-export default CreateQuestion;
+export default CreateTest;
