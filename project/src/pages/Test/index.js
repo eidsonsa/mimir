@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Button, Tooltip, Typography, useTheme } from "@mui/material";
 import { useParams } from "react-router-dom";
 import useGetTest from "../../hooks/useGetTest";
 import PageContainer from "../../components/PageContainer";
@@ -10,6 +10,8 @@ const Test = () => {
 
   const { testId } = useParams();
   const { test } = useGetTest(testId);
+
+  const answerLink = `${window.location.host}/answer/${testId}`;
 
   if (!test) {
     return <Typography>Loading</Typography>;
@@ -70,6 +72,14 @@ const Test = () => {
           </Typography>
         </Box>
       </Box>
+      <Tooltip title="Link will be copied to your clipboard">
+        <Button
+          variant="contained"
+          onClick={() => navigator.clipboard.writeText(answerLink)}
+        >
+          Submission Link
+        </Button>
+      </Tooltip>
     </PageContainer>
   );
 };

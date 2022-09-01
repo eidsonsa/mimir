@@ -19,6 +19,8 @@ const TestSubmission = () => {
   const [testAnswers, setTestAnswers] = useState();
   const [randomQuestions, setRandomQuestions] = useState();
   const [actualQuestion, setActualQuestion] = useState();
+  const [startTime, setStartTime] = useState();
+  const [exitScreen, setExitScreen] = useState(false);
 
   const inputRef = useRef(null);
 
@@ -50,13 +52,24 @@ const TestSubmission = () => {
     return <Typography>Loading</Typography>;
   }
 
+  document.addEventListener("visibilitychange", () => {
+    if (!exitScreen && document.visibilityState !== "visible") {
+      setExitScreen(true);
+    }
+  });
+
   const lastPage = 1 + test.questions.length;
 
   const handleClick = () => {
+    if (page === 1) {
+      setStartTime(Date.now());
+    }
     if (page > 1 && page !== lastPage) {
       inputRef.current.value = "";
     }
     if (page === lastPage) {
+      const endTime = Date.now();
+      const elapsedTime = (endTime - startTime) / 1000;
       const demographicAnswersArray = Object.entries(demographicAnswers).map(
         (entry) => ({ demographicQuestion: entry[0], answer: entry[1] })
       );
@@ -68,10 +81,21 @@ const TestSubmission = () => {
         testId,
         demographicAnswers: demographicAnswersArray,
         answers: testAnswersArray,
+        elapsedTime,
+        exitScreen,
       });
     }
     setPage(page + 1);
   };
+
+  const isDisabled =
+    page === 1
+      ? !!demographicAnswers === false ||
+        Object.keys(demographicAnswers).length !==
+          test.demographicQuestions.length
+      : page > 1 && page <= lastPage
+      ? !!inputRef.current && inputRef.current.value === ""
+      : false;
 
   return (
     <PageContainer>
@@ -138,6 +162,7 @@ const TestSubmission = () => {
             onClick={handleClick}
             variant="contained"
             sx={{ borderRadius: 20, width: 200, marginTop: 5 }}
+            disabled={isDisabled}
           >
             {page === lastPage ? "Submit" : "Next"}
           </Button>

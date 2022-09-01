@@ -8,6 +8,8 @@ export default function useSubmitAnswer() {
       testId: values.testId,
       demographicAnswers: values.demographicAnswers,
       answers: values.answers,
+      elapsedTime: values.elapsedTime.toString(),
+      exitScreen: values.exitScreen,
     })
       .then(() => {
         console.log("Submission created!");
