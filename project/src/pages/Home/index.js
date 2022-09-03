@@ -1,10 +1,11 @@
 import React, { useContext } from "react";
 import { AuthGoogleContext } from "../../contexts/authGoogle";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Typography, useTheme } from "@mui/material";
 import useQuestions from "../../hooks/useQuestions";
 import HomeTable from "../../components/HomeTable";
 import useTests from "../../hooks/useTests";
 import PageContainer from "../../components/PageContainer";
+import SpaceBetweenBox from "../../components/SpaceBetweenBox";
 
 const Home = () => {
   const { user } = useContext(AuthGoogleContext);
@@ -23,9 +24,7 @@ const Home = () => {
       <Typography color={theme.palette.primary.main} variant="h4">
         Welcome, {userLoggedIn.displayName}!
       </Typography>
-      <Box
-        sx={{ display: "flex", width: "100%", justifyContent: "space-between" }}
-      >
+      <SpaceBetweenBox>
         <HomeTable
           rows={questions}
           link="/question"
@@ -38,7 +37,7 @@ const Home = () => {
           title="Tests"
           buttonLink="/create-test"
         />
-      </Box>
+      </SpaceBetweenBox>
     </PageContainer>
   );
 };

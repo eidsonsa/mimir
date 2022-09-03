@@ -1,7 +1,14 @@
-import { collection, doc, getDoc, getDocs, setDoc } from "@firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  setDoc,
+  updateDoc,
+} from "@firebase/firestore";
 import { useEffect, useState } from "react";
 
 import { db } from "../services/firebaseConfig";
+import { getId } from "../utils/idUtils";
 
 export default function useQuestions() {
   const [questions, setQuestions] = useState();
@@ -25,7 +32,8 @@ export default function useQuestions() {
   }
 
   function addQuestion(values) {
-    setDoc(doc(db, "questions", values.title), {
+    const id = getId(values.title);
+    setDoc(doc(db, "questions", id), {
       title: values.title,
       code: values.code,
       statement: values.statement,
@@ -39,5 +47,22 @@ export default function useQuestions() {
       .catch((error) => console.error(error.message));
   }
 
-  return { questions, addQuestion };
+  function updateQuestion(values) {
+    const questionRef = doc(db, "questions", values.id);
+
+    updateDoc(questionRef, {
+      title: values.title,
+      code: values.code,
+      statement: values.statement,
+      expectedAnswer: values.expectedAnswer,
+      isPrivate: values.isPrivate,
+      syntaxHighlighting: values.syntaxHighlighting,
+    })
+      .then(() => {
+        console.log("Question updated!");
+      })
+      .catch((error) => console.error(error.message));
+  }
+
+  return { questions, addQuestion, updateQuestion };
 }

@@ -1,42 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
+  Button,
+  TextField,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
 import useGetQuestion from "../../hooks/useGetQuestion";
 import { useParams } from "react-router-dom";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import html2canvas from "html2canvas";
-import { ExpandMoreOutlined } from "@mui/icons-material";
-import { nord } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import PageContainer from "../../components/PageContainer";
+import CodeImage from "../../components/CodeImage";
+import { useNavigate } from "react-router";
+import { Box } from "@mui/system";
 
 const Question = () => {
   const theme = useTheme();
-
+  const navigation = useNavigate();
   const { questionId } = useParams();
   const { question } = useGetQuestion(questionId);
-  const [codeImage, setCodeImage] = useState();
-
-  const handleGetCodeImage = async (question) => {
-    if (question) {
-      const element = document.getElementById("code-image");
-      const canvas = await html2canvas(element);
-      const data = canvas.toDataURL("image/jpg");
-      if (element.style.display !== "none") {
-        setCodeImage(data);
-      }
-      element.style.display = "none";
-    }
-  };
-
-  useEffect(() => {
-    handleGetCodeImage(question);
-  }, [question]);
 
   if (!question) {
     return <Typography>Loading</Typography>;
@@ -47,36 +28,43 @@ const Question = () => {
       <Typography color={theme.palette.primary.main} variant="h4">
         {question.title}
       </Typography>
-      <Box component="img" src={codeImage} />
-      <div id="code-image">
-        <SyntaxHighlighter language={question.syntaxHighlighting} style={nord}>
-          {question.code}
-        </SyntaxHighlighter>
-      </div>
-      <Typography
-        color={theme.palette.primary.main}
-        variant="h5"
-        paddingBottom={2}
+      <Box
+        sx={{
+          display: "flex",
+          columnGap: 20,
+          marginTop: 4,
+          flexDirection: "column",
+        }}
       >
-        {question.statement}
-      </Typography>
-      <Accordion color="primary">
-        <AccordionSummary
-          expandIcon={<ExpandMoreOutlined color="primary" />}
+        <CodeImage question={question} />
+        <Box
           sx={{
-            borderRadius: "10px",
+            display: "flex",
+            flexDirection: "column",
+            alignSelf: "center",
+            width: 600,
+            marginTop: 4,
           }}
         >
-          <Typography sx={{ color: theme.palette.primary.main }}>
-            Expected Answer
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography sx={{ color: theme.palette.primary.main }}>
-            {question.expectedAnswer}
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
+          <Tooltip title={question.statement}>
+            <TextField
+              label={question.statement}
+              variant="outlined"
+              fullWidth
+              sx={{ marginY: 2 }}
+              value={question.expectedAnswer}
+              InputProps={{ style: { fontSize: 24 } }}
+              InputLabelProps={{ style: { fontSize: 24 } }}
+            />
+          </Tooltip>
+          <Button
+            variant="contained"
+            onClick={() => navigation.navigate(`/question/${questionId}/edit`)}
+          >
+            Edit question
+          </Button>
+        </Box>
+      </Box>
     </PageContainer>
   );
 };

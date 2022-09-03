@@ -12,8 +12,45 @@ export default function useExportSubmissions(testId) {
   }, []);
 
   useEffect(() => {
+    function getCSV() {
+      if (submissions && submissions.length >= 1) {
+        const headerDemographicQuestions =
+          submissions[0].demographicAnswers.map(
+            (val) => val.demographicQuestion
+          );
+        const headerQuestions = submissions[0].answers.map(
+          (val) => val.question
+        );
+        const header = []
+          .concat(headerDemographicQuestions)
+          .concat(headerQuestions)
+          .concat(["elapsedTime", "exitScreen"]);
+
+        const items = submissions.map((obj) => {
+          const answer = headerQuestions.map((val) => {
+            const item = obj.answers.find((ans) => ans.question === val);
+            return item ? item.answer : "";
+          });
+          const demographicAnswer = headerDemographicQuestions.map((val) => {
+            const item = obj.demographicAnswers.find(
+              (ans) => ans.demographicQuestion === val
+            );
+            return item ? item.answer : "";
+          });
+          const item = []
+            .concat(demographicAnswer)
+            .concat(answer)
+            .concat([obj.elapsedTime ?? "", obj.exitScreen ?? ""]);
+          return item;
+        });
+
+        const csvData = [].concat(items);
+        csvData.unshift(header);
+        setCSV(csvData);
+      }
+    }
     getCSV();
-  }, [submissions, getCSV]);
+  }, [submissions]);
 
   const querySubmissions = query(
     collection(db, "submissions"),
@@ -27,41 +64,6 @@ export default function useExportSubmissions(testId) {
         setSubmissions(submissionsList);
       })
       .catch((error) => console.log(error.message));
-  }
-
-  function getCSV() {
-    if (submissions && submissions.length >= 1) {
-      const headerDemographicQuestions = submissions[0].demographicAnswers.map(
-        (val) => val.demographicQuestion
-      );
-      const headerQuestions = submissions[0].answers.map((val) => val.question);
-      const header = []
-        .concat(headerDemographicQuestions)
-        .concat(headerQuestions)
-        .concat(["elapsedTime", "exitScreen"]);
-
-      const items = submissions.map((obj) => {
-        const answer = headerQuestions.map((val) => {
-          const item = obj.answers.find((ans) => ans.question === val);
-          return item ? item.answer : "";
-        });
-        const demographicAnswer = headerDemographicQuestions.map((val) => {
-          const item = obj.demographicAnswers.find(
-            (ans) => ans.demographicQuestion === val
-          );
-          return item ? item.answer : "";
-        });
-        const item = []
-          .concat(demographicAnswer)
-          .concat(answer)
-          .concat([obj.elapsedTime ?? "", obj.exitScreen ?? ""]);
-        return item;
-      });
-
-      const csvData = [].concat(items);
-      csvData.unshift(header);
-      setCSV(csvData);
-    }
   }
 
   return { csv };

@@ -2,6 +2,7 @@ import { collection, doc, getDocs, setDoc } from "@firebase/firestore";
 import { useEffect, useState } from "react";
 
 import { db } from "../services/firebaseConfig";
+import { getId } from "../utils/idUtils";
 
 export default function useTests() {
   const [tests, setTests] = useState();
@@ -25,7 +26,8 @@ export default function useTests() {
   }
 
   function addTest(values) {
-    setDoc(doc(db, "tests", values.title), {
+    const id = getId(values.title);
+    setDoc(doc(db, "tests", id), {
       title: values.title,
       instructionsPage: values.instructionsPage,
       demographicQuestions: values.demographicQuestions,

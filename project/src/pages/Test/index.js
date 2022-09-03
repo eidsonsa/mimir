@@ -6,6 +6,7 @@ import PageContainer from "../../components/PageContainer";
 import HomeTable from "../../components/HomeTable";
 import useExportSubmissions from "../../hooks/useExportSubmissions";
 import { CSVLink } from "react-csv";
+import SpaceBetweenBox from "../../components/SpaceBetweenBox";
 
 const Test = () => {
   const theme = useTheme();
@@ -37,16 +38,12 @@ const Test = () => {
     };
   });
 
-  console.log(csv);
-
   return (
     <PageContainer>
       <Typography color={theme.palette.primary.main} variant="h4">
         {test.title}
       </Typography>
-      <Box
-        sx={{ display: "flex", width: "100%", justifyContent: "space-between" }}
-      >
+      <SpaceBetweenBox>
         <HomeTable rows={questions} link="/question" title="Questions" />
         <Box sx={{ flex: 1, marginTop: 2 }}>
           <Typography color={theme.palette.primary.main} variant="h5">
@@ -85,7 +82,7 @@ const Test = () => {
             {test.showExpectedAnswer ? "True" : "False"}
           </Typography>
         </Box>
-      </Box>
+      </SpaceBetweenBox>
       <Box display="flex" flexDirection="row" columnGap={10} marginTop={10}>
         <Tooltip title="Link will be copied to your clipboard">
           <Button
