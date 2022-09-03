@@ -1,17 +1,28 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Box, Button, Tooltip, Typography, useTheme } from "@mui/material";
 import { useParams } from "react-router-dom";
 import useGetTest from "../../hooks/useGetTest";
 import PageContainer from "../../components/PageContainer";
 import HomeTable from "../../components/HomeTable";
+import useExportSubmissions from "../../hooks/useExportSubmissions";
+import { CSVLink } from "react-csv";
 
 const Test = () => {
   const theme = useTheme();
 
   const { testId } = useParams();
   const { test } = useGetTest(testId);
+  const { csv } = useExportSubmissions(testId);
+  const csvLink = useRef();
 
   const answerLink = `${window.location.host}/answer/${testId}`;
+
+  useEffect(() => {
+    if (csv) {
+      const element = document.getElementById("link");
+      element.style.display = "none";
+    }
+  }, [csv]);
 
   if (!test) {
     return <Typography>Loading</Typography>;
@@ -25,6 +36,8 @@ const Test = () => {
       },
     };
   });
+
+  console.log(csv);
 
   return (
     <PageContainer>
@@ -55,6 +68,7 @@ const Test = () => {
                 color={theme.palette.primary.main}
                 variant="body1"
                 marginBottom={1}
+                key={question}
               >
                 {question}
               </Typography>
@@ -72,14 +86,35 @@ const Test = () => {
           </Typography>
         </Box>
       </Box>
-      <Tooltip title="Link will be copied to your clipboard">
-        <Button
-          variant="contained"
-          onClick={() => navigator.clipboard.writeText(answerLink)}
-        >
-          Submission Link
-        </Button>
-      </Tooltip>
+      <Box display="flex" flexDirection="row" columnGap={10} marginTop={10}>
+        <Tooltip title="Link will be copied to your clipboard">
+          <Button
+            variant="contained"
+            onClick={() => navigator.clipboard.writeText(answerLink)}
+          >
+            Submission Link
+          </Button>
+        </Tooltip>
+        {csv && (
+          <Box>
+            <Tooltip title="Submissions will be downloaded as CSV">
+              <Button
+                variant="contained"
+                onClick={() => csvLink.current && csvLink.current.link.click()}
+              >
+                Export Answers
+              </Button>
+            </Tooltip>
+            <CSVLink
+              data={csv}
+              filename={`${testId}_submissions.csv`}
+              id="link"
+              ref={csvLink}
+              target="_blank"
+            />
+          </Box>
+        )}
+      </Box>
     </PageContainer>
   );
 };

@@ -18,20 +18,35 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 import whiteLogo from "../assets/white-logo.jpg";
 import { AuthGoogleContext } from "../contexts/authGoogle";
 
 export const PrivateRoutes = () => {
   const { user, signOut } = useContext(AuthGoogleContext);
-  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  if (!user) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [userLoggedIn, setUserLoggedIn] = useState();
+
+  useEffect(() => {
+    function isJsonString(str) {
+      try {
+        JSON.parse(str);
+      } catch (e) {
+        return false;
+      }
+      return true;
+    }
+    if (isJsonString(user)) {
+      setUserLoggedIn(JSON.parse(user));
+    }
+  }, [user]);
+
+  if (!userLoggedIn) {
     return;
   }
-  const userLoggedIn = JSON.parse(user);
 
   const navigationItems = [
     {
