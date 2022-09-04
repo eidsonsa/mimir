@@ -7,13 +7,16 @@ import HomeTable from "../../components/HomeTable";
 import useExportSubmissions from "../../hooks/useExportSubmissions";
 import { CSVLink } from "react-csv";
 import SpaceBetweenBox from "../../components/SpaceBetweenBox";
+import { useNavigate } from "react-router";
+import useQuestions from "../../hooks/useQuestions";
 
 const Test = () => {
   const theme = useTheme();
-
+  const navigate = useNavigate();
   const { testId } = useParams();
   const { test } = useGetTest(testId);
   const { csv } = useExportSubmissions(testId);
+  const { questions: questionsData } = useQuestions();
   const csvLink = useRef();
 
   const answerLink = `${window.location.host}/answer/${testId}`;
@@ -25,18 +28,13 @@ const Test = () => {
     }
   }, [csv]);
 
-  if (!test) {
+  if (!test || !questionsData) {
     return <Typography>Loading</Typography>;
   }
 
-  const questions = test.questions.map((question) => {
-    return {
-      id: question,
-      data: {
-        title: question,
-      },
-    };
-  });
+  const questions = questionsData.filter((quest) =>
+    test.questions.includes(quest.id)
+  );
 
   return (
     <PageContainer>
@@ -111,6 +109,12 @@ const Test = () => {
             />
           </Box>
         )}
+        <Button
+          variant="contained"
+          onClick={() => navigate(`/test/${testId}/edit`)}
+        >
+          Edit test
+        </Button>
       </Box>
     </PageContainer>
   );

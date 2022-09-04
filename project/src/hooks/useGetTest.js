@@ -11,14 +11,16 @@ export default function useGetTest(testId) {
   }, []);
 
   function getTest() {
-    const docRef = doc(db, "tests", testId);
-    getDoc(docRef)
-      .then((response) => {
-        if (response.exists()) {
-          setTest(response.data());
-        }
-      })
-      .catch((error) => console.log(error.message));
+    if (testId) {
+      const docRef = doc(db, "tests", testId);
+      getDoc(docRef)
+        .then((response) => {
+          if (response.exists()) {
+            setTest(response.data());
+          }
+        })
+        .catch((error) => console.log(error.message));
+    }
   }
 
   return { test };

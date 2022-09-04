@@ -1,4 +1,10 @@
-import { collection, doc, getDocs, setDoc } from "@firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  setDoc,
+  updateDoc,
+} from "@firebase/firestore";
 import { useEffect, useState } from "react";
 
 import { db } from "../services/firebaseConfig";
@@ -40,5 +46,21 @@ export default function useTests() {
       .catch((error) => console.error(error.message));
   }
 
-  return { tests, addTest };
+  function updateTest(values) {
+    const testRef = doc(db, "tests", values.id);
+
+    updateDoc(testRef, {
+      title: values.title,
+      instructionsPage: values.instructionsPage,
+      demographicQuestions: values.demographicQuestions,
+      questions: values.questions,
+      showExpectedAnswer: values.showExpectedAnswer,
+    })
+      .then(() => {
+        console.log("Test updated!");
+      })
+      .catch((error) => console.error(error.message));
+  }
+
+  return { tests, addTest, updateTest };
 }

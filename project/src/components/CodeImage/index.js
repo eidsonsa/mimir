@@ -5,10 +5,8 @@ import { useEffect, useState } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { nord } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
-const CodeImage = (question) => {
+const CodeImage = ({ question }) => {
   const [codeImage, setCodeImage] = useState();
-
-  const actualQuestion = question.question;
 
   const handleGetCodeImage = async (question) => {
     if (question) {
@@ -24,10 +22,10 @@ const CodeImage = (question) => {
   };
 
   useEffect(() => {
-    handleGetCodeImage(actualQuestion);
-  }, [actualQuestion]);
+    handleGetCodeImage(question);
+  }, [question]);
 
-  if (!actualQuestion) {
+  if (!question) {
     return <Typography>Loading</Typography>;
   }
 
@@ -35,11 +33,8 @@ const CodeImage = (question) => {
     <>
       <Box component="img" src={codeImage} maxWidth={800} />
       <Box id="code-image" justifyContent="center">
-        <SyntaxHighlighter
-          language={actualQuestion.syntaxHighlighting}
-          style={nord}
-        >
-          {actualQuestion.code}
+        <SyntaxHighlighter language={question.syntaxHighlighting} style={nord}>
+          {question.code}
         </SyntaxHighlighter>
       </Box>
     </>

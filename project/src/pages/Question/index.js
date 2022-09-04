@@ -15,7 +15,7 @@ import { Box } from "@mui/system";
 
 const Question = () => {
   const theme = useTheme();
-  const navigation = useNavigate();
+  const navigate = useNavigate();
   const { questionId } = useParams();
   const { question } = useGetQuestion(questionId);
 
@@ -59,7 +59,7 @@ const Question = () => {
           </Tooltip>
           <Button
             variant="contained"
-            onClick={() => navigation.navigate(`/question/${questionId}/edit`)}
+            onClick={() => navigate(`/question/${questionId}/edit`)}
           >
             Edit question
           </Button>

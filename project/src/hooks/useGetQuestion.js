@@ -11,14 +11,16 @@ export default function useGetQuestion(questionId) {
   }, []);
 
   function getQuestion() {
-    const docRef = doc(db, "questions", questionId);
-    getDoc(docRef)
-      .then((response) => {
-        if (response.exists()) {
-          setQuestion(response.data());
-        }
-      })
-      .catch((error) => console.log(error.message));
+    if (questionId) {
+      const docRef = doc(db, "questions", questionId);
+      getDoc(docRef)
+        .then((response) => {
+          if (response.exists()) {
+            setQuestion(response.data());
+          }
+        })
+        .catch((error) => console.log(error.message));
+    }
   }
 
   return { question };

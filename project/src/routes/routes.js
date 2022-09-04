@@ -10,6 +10,7 @@ import CreateTest from "../pages/CreateTest";
 import Test from "../pages/Test";
 import TestSubmission from "../pages/TestSubmission";
 import EditQuestion from "../pages/Question/EditQuestion";
+import EditTest from "../pages/Test/EditTest";
 
 export const AppRoutes = () => {
   const { isLoggedIn } = useContext(AuthGoogleContext);
@@ -29,6 +30,7 @@ export const AppRoutes = () => {
               />
               <Route path="/create-test" element={<CreateTest />} />
               <Route path="/test/:testId" element={<Test />} />
+              <Route path="/test/:testId/edit" element={<EditTest />} />
             </Route>
           ) : (
             <Route path="/">
