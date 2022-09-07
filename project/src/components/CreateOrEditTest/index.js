@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Box,
@@ -12,6 +12,7 @@ import {
   FormControl,
   InputLabel,
   Chip,
+  Alert,
 } from "@mui/material";
 import { Formik } from "formik";
 import useQuestions from "../../hooks/useQuestions";
@@ -28,6 +29,8 @@ const CreateOrEditTest = ({ testId }) => {
   const { questions: questionsData } = useQuestions();
   const navigate = useNavigate();
 
+  const [showError, setShowError] = useState(false);
+
   const isEdit = !!testId;
 
   if (isEdit && !test) {
@@ -40,6 +43,9 @@ const CreateOrEditTest = ({ testId }) => {
 
   const questions = questionsData.map((question) => question.data.title);
 
+  const initialInstructionsPage =
+    "You will answer a few demographic questions and test your code comprehension.\n\nGood luck!";
+
   const initialValues = isEdit
     ? {
         title: test.title,
@@ -50,7 +56,7 @@ const CreateOrEditTest = ({ testId }) => {
       }
     : {
         title: "",
-        instructionsPage: "",
+        instructionsPage: initialInstructionsPage,
         demographicQuestions: [],
         questions: [],
         showExpectedAnswer: false,
@@ -75,7 +81,24 @@ const CreateOrEditTest = ({ testId }) => {
       navigate(`/test/${id}`);
     } catch (e) {
       console.error(e.message);
+      setShowError(true);
     }
+  };
+
+  const validate = (values) => {
+    const errors = {};
+
+    if (!values.title) {
+      errors.title = "Required";
+    }
+    if (!values.instructionsPage) {
+      errors.instructionsPage = "Required";
+    }
+    if (values.questions.length === 0) {
+      errors.questions = "Required";
+    }
+
+    return errors;
   };
 
   return (
@@ -91,8 +114,13 @@ const CreateOrEditTest = ({ testId }) => {
           flexDirection: "column",
         }}
       >
-        <Formik initialValues={initialValues} onSubmit={onSubmitTest}>
-          {({ handleChange, handleSubmit, setFieldValue, values }) => (
+        <Formik
+          initialValues={initialValues}
+          onSubmit={onSubmitTest}
+          validate={validate}
+          validateOnMount
+        >
+          {({ handleChange, handleSubmit, setFieldValue, values, isValid }) => (
             <>
               <TextField
                 label="Title"
@@ -167,12 +195,18 @@ const CreateOrEditTest = ({ testId }) => {
                 onClick={handleSubmit}
                 variant="contained"
                 sx={{ marginTop: 3 }}
+                disabled={!isValid}
               >
                 {isEdit ? "Update" : "Create"}
               </Button>
             </>
           )}
         </Formik>
+        {showError && (
+          <Alert severity="error" sx={{ marginTop: 3 }} variant="filled">
+            Something have occurred. Try again later!
+          </Alert>
+        )}
       </Box>
     </PageContainer>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Box,
@@ -11,6 +11,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Alert,
 } from "@mui/material";
 import { Formik } from "formik";
 import useQuestions from "../../hooks/useQuestions";
@@ -24,6 +25,8 @@ const CreateOrEditQuestion = ({ questionId }) => {
   const { addQuestion, updateQuestion } = useQuestions();
   const { question } = useGetQuestion(questionId);
   const navigate = useNavigate();
+
+  const [showError, setShowError] = useState(false);
 
   const isEdit = !!questionId;
 
@@ -61,7 +64,27 @@ const CreateOrEditQuestion = ({ questionId }) => {
       navigate(`/question/${id}`);
     } catch (e) {
       console.error(e.message);
+      setShowError(true);
     }
+  };
+
+  const validate = (values) => {
+    const errors = {};
+
+    if (!values.title) {
+      errors.title = "Required";
+    }
+    if (!values.code) {
+      errors.instructionsPage = "Required";
+    }
+    if (!values.statement) {
+      errors.instructionsPage = "Required";
+    }
+    if (!values.expectedAnswer) {
+      errors.instructionsPage = "Required";
+    }
+
+    return errors;
   };
 
   return (
@@ -77,8 +100,13 @@ const CreateOrEditQuestion = ({ questionId }) => {
           flexDirection: "column",
         }}
       >
-        <Formik initialValues={initialValues} onSubmit={onSubmitQuestion}>
-          {({ handleChange, handleSubmit, setFieldValue, values }) => (
+        <Formik
+          initialValues={initialValues}
+          onSubmit={onSubmitQuestion}
+          validate={validate}
+          validateOnMount
+        >
+          {({ handleChange, handleSubmit, setFieldValue, values, isValid }) => (
             <>
               <TextField
                 label="Title"
@@ -167,12 +195,18 @@ const CreateOrEditQuestion = ({ questionId }) => {
                 onClick={handleSubmit}
                 variant="contained"
                 sx={{ marginTop: 3 }}
+                disabled={!isValid}
               >
                 {isEdit ? "Update" : "Create"}
               </Button>
             </>
           )}
         </Formik>
+        {showError && (
+          <Alert severity="error" sx={{ marginTop: 3 }} variant="filled">
+            Something have occurred. Try again later!
+          </Alert>
+        )}
       </Box>
     </PageContainer>
   );

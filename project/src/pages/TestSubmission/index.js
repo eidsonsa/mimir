@@ -21,6 +21,7 @@ const TestSubmission = () => {
   const [actualQuestion, setActualQuestion] = useState();
   const [startTime, setStartTime] = useState();
   const [exitScreen, setExitScreen] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   const inputRef = useRef(null);
 
@@ -60,23 +61,17 @@ const TestSubmission = () => {
 
   const lastPage = 1 + test.questions.length;
 
-  const handleClick = () => {
-    if (page === 1) {
-      setStartTime(Date.now());
-    }
-    if (page > 1 && page !== lastPage) {
-      inputRef.current.value = "";
-    }
-    if (page === lastPage) {
-      const endTime = Date.now();
-      const elapsedTime = (endTime - startTime) / 1000;
-      const demographicAnswersArray = Object.entries(demographicAnswers).map(
-        (entry) => ({ demographicQuestion: entry[0], answer: entry[1] })
-      );
-      const testAnswersArray = Object.entries(testAnswers).map((entry) => ({
-        question: entry[0],
-        answer: entry[1],
-      }));
+  const handleSubmit = () => {
+    const endTime = Date.now();
+    const elapsedTime = (endTime - startTime) / 1000;
+    const demographicAnswersArray = Object.entries(demographicAnswers).map(
+      (entry) => ({ demographicQuestion: entry[0], answer: entry[1] })
+    );
+    const testAnswersArray = Object.entries(testAnswers).map((entry) => ({
+      question: entry[0],
+      answer: entry[1],
+    }));
+    try {
       submitAnswer({
         testId,
         demographicAnswers: demographicAnswersArray,
@@ -84,6 +79,25 @@ const TestSubmission = () => {
         elapsedTime,
         exitScreen,
       });
+    } catch (error) {
+      console.log(error);
+      setShowError(true);
+    }
+  };
+
+  const handleClick = () => {
+    if (page === 0 && !!test.demographicQuestions) {
+      setPage(page + 1);
+      setStartTime(Date.now());
+    }
+    if (page === 1) {
+      setStartTime(Date.now());
+    }
+    if (page > 1 && page !== lastPage) {
+      inputRef.current.value = "";
+    }
+    if (page === lastPage) {
+      handleSubmit();
     }
     setPage(page + 1);
   };
@@ -129,7 +143,9 @@ const TestSubmission = () => {
         ) : page === lastPage + 1 ? (
           <>
             <Typography variant="h5">
-              Your submission was sent successfully. Thank you for using Mimir!
+              {showError
+                ? "Something have occurred. Try again later!"
+                : "Your submission was sent successfully. Thank you for using Mimir!"}
             </Typography>
             <Box component="img" src={logo} maxWidth={600} marginTop={3} />
           </>
