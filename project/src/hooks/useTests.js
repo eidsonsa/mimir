@@ -9,24 +9,31 @@ import { useEffect, useState } from "react";
 
 import { db } from "../services/firebaseConfig";
 import { getId } from "../utils/idUtils";
+import useGetUser from "./useGetUser";
 
 export default function useTests() {
   const [tests, setTests] = useState();
+  const { user } = useGetUser();
 
   useEffect(() => {
     getTests();
-  }, []);
+  }, [user]);
 
   const testsCollectionRef = collection(db, "tests");
 
   function getTests() {
     getDocs(testsCollectionRef)
       .then((response) => {
-        const testsList = response.docs.map((doc) => ({
-          data: doc.data(),
-          id: doc.id,
-        }));
-        setTests(testsList);
+        if (user) {
+          const testsList = response.docs.map((doc) => ({
+            data: doc.data(),
+            id: doc.id,
+          }));
+          const filtered = testsList.filter(
+            (test) => test.data.creator === user.email
+          );
+          setTests(filtered);
+        }
       })
       .catch((error) => console.log(error.message));
   }
@@ -39,6 +46,7 @@ export default function useTests() {
       demographicQuestions: values.demographicQuestions,
       questions: values.questions,
       showExpectedAnswer: values.showExpectedAnswer,
+      creator: user.email,
     })
       .then(() => {
         console.log("Test created!");

@@ -24,7 +24,9 @@ const Test = () => {
   useEffect(() => {
     if (csv) {
       const element = document.getElementById("link");
-      element.style.display = "none";
+      if (element) {
+        element.style.display = "none";
+      }
     }
   }, [csv]);
 

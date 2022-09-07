@@ -6,27 +6,35 @@ import {
   updateDoc,
 } from "@firebase/firestore";
 import { useEffect, useState } from "react";
-
 import { db } from "../services/firebaseConfig";
 import { getId } from "../utils/idUtils";
+import useGetUser from "./useGetUser";
 
 export default function useQuestions() {
   const [questions, setQuestions] = useState();
+  const { user } = useGetUser();
 
   useEffect(() => {
     getQuestions();
-  }, []);
+  }, [user]);
 
   const questionsCollectionRef = collection(db, "questions");
 
   function getQuestions() {
     getDocs(questionsCollectionRef)
       .then((response) => {
-        const questionsList = response.docs.map((doc) => ({
-          data: doc.data(),
-          id: doc.id,
-        }));
-        setQuestions(questionsList);
+        if (user) {
+          const questionsList = response.docs.map((doc) => ({
+            data: doc.data(),
+            id: doc.id,
+          }));
+          const filtered = questionsList.filter(
+            (question) =>
+              question.data.isPrivate === false ||
+              question.data.creator === user.email
+          );
+          setQuestions(filtered);
+        }
       })
       .catch((error) => console.log(error.message));
   }
@@ -40,6 +48,7 @@ export default function useQuestions() {
       expectedAnswer: values.expectedAnswer,
       isPrivate: values.isPrivate,
       syntaxHighlighting: values.syntaxHighlighting,
+      creator: user.email,
     })
       .then(() => {
         console.log("Question created!");

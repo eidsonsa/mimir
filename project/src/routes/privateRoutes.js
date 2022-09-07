@@ -18,33 +18,20 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 import whiteLogo from "../assets/white-logo.jpg";
 import { AuthGoogleContext } from "../contexts/authGoogle";
+import useGetUser from "../hooks/useGetUser";
 
 export const PrivateRoutes = () => {
-  const { user, signOut } = useContext(AuthGoogleContext);
+  const { signOut } = useContext(AuthGoogleContext);
   const navigate = useNavigate();
+  const { user } = useGetUser();
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [userLoggedIn, setUserLoggedIn] = useState();
 
-  useEffect(() => {
-    function isJsonString(str) {
-      try {
-        JSON.parse(str);
-      } catch (e) {
-        return false;
-      }
-      return true;
-    }
-    if (isJsonString(user)) {
-      setUserLoggedIn(JSON.parse(user));
-    }
-  }, [user]);
-
-  if (!userLoggedIn) {
+  if (!user) {
     return;
   }
 
@@ -98,13 +85,8 @@ export const PrivateRoutes = () => {
               />
             </Box>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography paddingRight={4}>
-                {userLoggedIn.displayName}
-              </Typography>
-              <Avatar
-                alt={userLoggedIn.displayName}
-                src={userLoggedIn.photoURL}
-              />
+              <Typography paddingRight={4}>{user.displayName}</Typography>
+              <Avatar alt={user.displayName} src={user.photoURL} />
             </Box>
           </Toolbar>
         </AppBar>
