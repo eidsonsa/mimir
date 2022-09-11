@@ -12,6 +12,7 @@ import {
   FormControl,
   InputLabel,
   Alert,
+  Fab,
 } from "@mui/material";
 import { FieldArray, Formik } from "formik";
 import useQuestions from "../../hooks/useQuestions";
@@ -19,6 +20,8 @@ import useGetQuestion from "../../hooks/useGetQuestion";
 import { useNavigate } from "react-router";
 import PageContainer from "../../components/PageContainer";
 import { getId } from "../../utils/idUtils";
+import AddIcon from "@mui/icons-material/Add";
+import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
 
 const CreateOrEditQuestion = ({ questionId }) => {
   const theme = useTheme();
@@ -157,29 +160,40 @@ const CreateOrEditQuestion = ({ questionId }) => {
                                   e.target.selectionEnd = cursorPosition + 1;
                                 }
                               }}
+                              InputProps={{
+                                endAdornment: (
+                                  <>
+                                    <Fab
+                                      color="primary"
+                                      size="small"
+                                      onClick={() => arrayHelpers.remove(index)}
+                                      disabled={values.code.length < 2}
+                                    >
+                                      <HorizontalRuleIcon />
+                                    </Fab>
+                                    {index === values.code.length - 1 && (
+                                      <Fab
+                                        size="small"
+                                        color="primary"
+                                        sx={{ marginLeft: 1 }}
+                                        onClick={() => {
+                                          arrayHelpers.push("");
+                                        }}
+                                        disabled={
+                                          values.code.findIndex(
+                                            (val) => val === ""
+                                          ) !== -1
+                                        }
+                                      >
+                                        <AddIcon />
+                                      </Fab>
+                                    )}
+                                  </>
+                                ),
+                              }}
                             />
-                            <Button
-                              onClick={() => arrayHelpers.remove(index)}
-                              variant="outlined"
-                              disabled={values.code.length < 2}
-                              sx={{ marginY: 1 }}
-                            >
-                              Delete Code Snippet
-                            </Button>
                           </>
                         ))}
-                      <Button
-                        onClick={() => {
-                          arrayHelpers.push("");
-                        }}
-                        variant="contained"
-                        disabled={
-                          values.code.findIndex((val) => val === "") !== -1
-                        }
-                        sx={{ marginY: 1 }}
-                      >
-                        New Code snippet
-                      </Button>
                     </>
                   )}
                 />
