@@ -13,7 +13,7 @@ import {
   InputLabel,
   Alert,
 } from "@mui/material";
-import { Formik } from "formik";
+import { FieldArray, Formik } from "formik";
 import useQuestions from "../../hooks/useQuestions";
 import useGetQuestion from "../../hooks/useGetQuestion";
 import { useNavigate } from "react-router";
@@ -45,7 +45,7 @@ const CreateOrEditQuestion = ({ questionId }) => {
       }
     : {
         title: "",
-        code: "",
+        code: [""],
         statement: "",
         expectedAnswer: "",
         isPrivate: false,
@@ -74,7 +74,7 @@ const CreateOrEditQuestion = ({ questionId }) => {
     if (!values.title) {
       errors.title = "Required";
     }
-    if (!values.code) {
+    if (values.code[0] === "") {
       errors.instructionsPage = "Required";
     }
     if (!values.statement) {
@@ -106,101 +106,137 @@ const CreateOrEditQuestion = ({ questionId }) => {
           validate={validate}
           validateOnMount
         >
-          {({ handleChange, handleSubmit, setFieldValue, values, isValid }) => (
-            <>
-              <TextField
-                label="Title"
-                variant="outlined"
-                fullWidth
-                sx={{ marginY: 1 }}
-                name="title"
-                value={values.title}
-                onChange={handleChange}
-              />
-              <TextField
-                label="Code"
-                variant="outlined"
-                multiline
-                minRows={10}
-                maxRows={10}
-                fullWidth
-                value={values.code}
-                sx={{ marginY: 1 }}
-                name="code"
-                onChange={handleChange}
-                onKeyDown={(e) => {
-                  const { value } = e.target;
+          {({ handleChange, handleSubmit, setFieldValue, values, isValid }) => {
+            return (
+              <>
+                <TextField
+                  label="Title"
+                  variant="outlined"
+                  fullWidth
+                  sx={{ marginY: 1 }}
+                  name="title"
+                  value={values.title}
+                  onChange={handleChange}
+                />
+                <FieldArray
+                  name="code"
+                  render={(arrayHelpers) => (
+                    <>
+                      {values.code &&
+                        values.code.map((val, index) => (
+                          <>
+                            <TextField
+                              label="Code Snippet"
+                              variant="outlined"
+                              multiline
+                              minRows={10}
+                              maxRows={10}
+                              fullWidth
+                              value={val}
+                              sx={{ marginY: 1 }}
+                              name={`code.${index}`}
+                              onChange={handleChange}
+                              onKeyDown={(e) => {
+                                const { value } = e.target;
 
-                  if (e.key === "Tab") {
-                    e.preventDefault();
+                                if (e.key === "Tab") {
+                                  e.preventDefault();
 
-                    const cursorPosition = e.target.selectionStart;
-                    const cursorEndPosition = e.target.selectionEnd;
-                    const tab = "\t";
+                                  const cursorPosition =
+                                    e.target.selectionStart;
+                                  const cursorEndPosition =
+                                    e.target.selectionEnd;
+                                  const tab = "\t";
 
-                    e.target.value =
-                      value.substring(0, cursorPosition) +
-                      tab +
-                      value.substring(cursorEndPosition);
+                                  e.target.value =
+                                    value.substring(0, cursorPosition) +
+                                    tab +
+                                    value.substring(cursorEndPosition);
 
-                    e.target.selectionStart = cursorPosition + 1;
-                    e.target.selectionEnd = cursorPosition + 1;
-                  }
-                }}
-              />
-              <TextField
-                label="Statement"
-                variant="outlined"
-                fullWidth
-                sx={{ marginY: 1 }}
-                value={values.statement}
-                name="statement"
-                onChange={handleChange}
-              />
-              <TextField
-                label="Expected Answer"
-                variant="outlined"
-                fullWidth
-                sx={{ marginY: 1 }}
-                value={values.expectedAnswer}
-                name="expectedAnswer"
-                onChange={handleChange}
-              />
-              <FormControl sx={{ marginY: 1 }}>
-                <InputLabel>Syntax Highlighting</InputLabel>
-                <Select
-                  label="Syntax Highlighting"
-                  onChange={(event) =>
-                    setFieldValue("syntaxHighlighting", event.target.value)
-                  }
-                  value={values.syntaxHighlighting || ""}
-                >
-                  <MenuItem value="">None</MenuItem>
-                  <MenuItem value="python">Python</MenuItem>
-                  <MenuItem value="javascript">Javascript</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControlLabel
-                control={
-                  <Switch
+                                  e.target.selectionStart = cursorPosition + 1;
+                                  e.target.selectionEnd = cursorPosition + 1;
+                                }
+                              }}
+                            />
+                            <Button
+                              onClick={() => arrayHelpers.remove(index)}
+                              variant="outlined"
+                              disabled={values.code.length < 2}
+                              sx={{ marginY: 1 }}
+                            >
+                              Delete Code Snippet
+                            </Button>
+                          </>
+                        ))}
+                      <Button
+                        onClick={() => {
+                          arrayHelpers.push("");
+                        }}
+                        variant="contained"
+                        disabled={
+                          values.code.findIndex((val) => val === "") !== -1
+                        }
+                        sx={{ marginY: 1 }}
+                      >
+                        New Code snippet
+                      </Button>
+                    </>
+                  )}
+                />
+                <TextField
+                  label="Statement"
+                  variant="outlined"
+                  fullWidth
+                  sx={{ marginY: 1 }}
+                  value={values.statement}
+                  name="statement"
+                  onChange={handleChange}
+                />
+                <TextField
+                  label="Expected Answer"
+                  variant="outlined"
+                  fullWidth
+                  sx={{ marginY: 1 }}
+                  value={values.expectedAnswer}
+                  name="expectedAnswer"
+                  onChange={handleChange}
+                />
+                <FormControl sx={{ marginY: 1 }}>
+                  <InputLabel>Syntax Highlighting</InputLabel>
+                  <Select
+                    label="Syntax Highlighting"
                     onChange={(event) =>
-                      setFieldValue("isPrivate", event.target.checked)
+                      setFieldValue("syntaxHighlighting", event.target.value)
                     }
-                    value={values.isPrivate}
-                  />
-                }
-                label="Is Private"
-              />
-              <Button
-                onClick={handleSubmit}
-                variant="contained"
-                sx={{ marginTop: 3 }}
-                disabled={!isValid}
-              >
-                {isEdit ? "Update" : "Create"}
-              </Button>
-            </>
-          )}
+                    value={values.syntaxHighlighting || ""}
+                  >
+                    <MenuItem value="">None</MenuItem>
+                    <MenuItem value="python">Python</MenuItem>
+                    <MenuItem value="javascript">Javascript</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      onChange={(event) =>
+                        setFieldValue("isPrivate", event.target.checked)
+                      }
+                      value={values.isPrivate}
+                    />
+                  }
+                  label="Is Private"
+                />
+                <Button
+                  onClick={handleSubmit}
+                  variant="contained"
+                  sx={{ marginTop: 3 }}
+                  disabled={!isValid}
+                >
+                  {isEdit ? "Update" : "Create"}
+                </Button>
+              </>
+            );
+          }}
         </Formik>
         {showError && (
           <Alert severity="error" sx={{ marginTop: 3 }} variant="filled">

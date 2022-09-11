@@ -23,17 +23,19 @@ export default function useQuestions() {
   function getQuestions() {
     getDocs(questionsCollectionRef)
       .then((response) => {
+        const questionsList = response.docs.map((doc) => ({
+          data: doc.data(),
+          id: doc.id,
+        }));
         if (user) {
-          const questionsList = response.docs.map((doc) => ({
-            data: doc.data(),
-            id: doc.id,
-          }));
           const filtered = questionsList.filter(
             (question) =>
               question.data.isPrivate === false ||
               question.data.creator === user.email
           );
           setQuestions(filtered);
+        } else {
+          setQuestions(questionsList);
         }
       })
       .catch((error) => console.log(error.message));

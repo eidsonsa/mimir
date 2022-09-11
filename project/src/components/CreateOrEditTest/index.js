@@ -13,14 +13,17 @@ import {
   InputLabel,
   Chip,
   Alert,
+  Fab,
 } from "@mui/material";
-import { Formik } from "formik";
+import { FieldArray, Formik } from "formik";
 import useQuestions from "../../hooks/useQuestions";
 import { useNavigate } from "react-router";
 import PageContainer from "../../components/PageContainer";
 import { getId } from "../../utils/idUtils";
 import useTests from "../../hooks/useTests";
 import useGetTest from "../../hooks/useGetTest";
+import AddIcon from "@mui/icons-material/Add";
+import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
 
 const CreateOrEditTest = ({ testId }) => {
   const theme = useTheme();
@@ -50,24 +53,26 @@ const CreateOrEditTest = ({ testId }) => {
     ? {
         title: test.title,
         instructionsPage: test.instructionsPage,
-        demographicQuestions: test.demographicQuestions.join("\n"),
+        demographicQuestions: test.demographicQuestions,
         questions: test.questions,
         showExpectedAnswer: test.showExpectedAnswer,
       }
     : {
         title: "",
         instructionsPage: initialInstructionsPage,
-        demographicQuestions: [],
+        demographicQuestions: [""],
         questions: [],
         showExpectedAnswer: false,
       };
 
   const onSubmitTest = (values) => {
-    const demographicArrayQuestions = values.demographicQuestions.split("\n");
     const questionsIds = values.questions.map(getId);
     const newValues = {
       ...values,
-      demographicQuestions: demographicArrayQuestions,
+      demographicQuestions:
+        values.demographicQuestions[0] === ""
+          ? []
+          : values.demographicQuestions,
       questions: questionsIds,
     };
     try {
@@ -143,18 +148,70 @@ const CreateOrEditTest = ({ testId }) => {
                 name="instructionsPage"
                 onChange={handleChange}
               />
-              <TextField
-                label="Demographic Questions"
-                variant="outlined"
-                multiline
-                minRows={5}
-                maxRows={5}
-                fullWidth
-                value={values.demographicQuestions}
-                sx={{ marginY: 1 }}
+
+              <FieldArray
                 name="demographicQuestions"
-                placeholder="Type 1 question on each line"
-                onChange={handleChange}
+                render={(arrayHelpers) => (
+                  <>
+                    {values.demographicQuestions &&
+                      values.demographicQuestions.map((val, index) => (
+                        <TextField
+                          label="Demographic Question"
+                          variant="outlined"
+                          sx={{ marginY: 1 }}
+                          fullWidth
+                          value={val}
+                          name={`demographicQuestions.${index}`}
+                          onChange={handleChange}
+                          InputProps={{
+                            endAdornment: (
+                              <>
+                                <Fab
+                                  color="primary"
+                                  size="small"
+                                  onClick={() => arrayHelpers.remove(index)}
+                                  disabled={
+                                    values.demographicQuestions.length === 1
+                                  }
+                                >
+                                  <HorizontalRuleIcon />
+                                </Fab>
+                                {index ===
+                                  values.demographicQuestions.length - 1 && (
+                                  <Fab
+                                    size="small"
+                                    color="primary"
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={() => {
+                                      arrayHelpers.push("");
+                                    }}
+                                    disabled={
+                                      values.demographicQuestions.findIndex(
+                                        (val) => val === ""
+                                      ) !== -1
+                                    }
+                                  >
+                                    <AddIcon />
+                                  </Fab>
+                                )}
+                              </>
+                            ),
+                          }}
+                        />
+                      ))}
+                    {values.demographicQuestions.length === 0 && (
+                      <Button
+                        onClick={() => {
+                          arrayHelpers.push("");
+                        }}
+                        variant="contained"
+                        sx={{ marginY: 1 }}
+                      >
+                        add Demographic question
+                      </Button>
+                    )}
+                  </>
+                )}
               />
               <FormControl sx={{ marginY: 1 }}>
                 <InputLabel>Questions</InputLabel>

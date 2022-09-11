@@ -25,7 +25,7 @@ const TestSubmission = () => {
 
   const inputRef = useRef(null);
 
-  const { questions: questionsList } = useQuestions();
+  const { questions: questionsList } = useQuestions(true);
   const { submitAnswer } = useSubmitAnswer();
 
   useEffect(() => {
@@ -118,7 +118,9 @@ const TestSubmission = () => {
       </Typography>
       <Box marginTop={8} maxWidth="60%" textAlign="center">
         {page === 0 ? (
-          <Typography variant="h5">{test.instructionsPage}</Typography>
+          <Typography variant="h5" textAlign="left">
+            {test.instructionsPage}
+          </Typography>
         ) : page === 1 ? (
           <>
             {test.demographicQuestions.map((question) => {
