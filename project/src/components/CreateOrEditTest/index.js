@@ -5,8 +5,6 @@ import {
   Typography,
   useTheme,
   TextField,
-  Switch,
-  FormControlLabel,
   Select,
   MenuItem,
   FormControl,
@@ -24,6 +22,7 @@ import useTests from "../../hooks/useTests";
 import useGetTest from "../../hooks/useGetTest";
 import AddIcon from "@mui/icons-material/Add";
 import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
+import { getPairs } from "../../utils/orderUtils";
 
 const CreateOrEditTest = ({ testId }) => {
   const theme = useTheme();
@@ -55,18 +54,19 @@ const CreateOrEditTest = ({ testId }) => {
         instructionsPage: test.instructionsPage,
         demographicQuestions: test.demographicQuestions,
         questions: test.questions,
-        showExpectedAnswer: test.showExpectedAnswer,
+        pairs: getPairs(test.pairs),
       }
     : {
         title: "",
         instructionsPage: initialInstructionsPage,
         demographicQuestions: [""],
         questions: [],
-        showExpectedAnswer: false,
+        pairs: [[]],
       };
 
   const onSubmitTest = (values) => {
     const questionsIds = values.questions.map(getId);
+    const pairIds = values.pairs.flat().map(getId);
     const newValues = {
       ...values,
       demographicQuestions:
@@ -74,6 +74,7 @@ const CreateOrEditTest = ({ testId }) => {
           ? []
           : values.demographicQuestions,
       questions: questionsIds,
+      pairs: pairIds,
     };
     try {
       if (isEdit) {
@@ -101,6 +102,9 @@ const CreateOrEditTest = ({ testId }) => {
     }
     if (values.questions.length === 0) {
       errors.questions = "Required";
+    }
+    if (values.pairs.length > 0 && values.pairs.at(-1).length === 1) {
+      errors.pairs = "Missing";
     }
 
     return errors;
@@ -237,16 +241,98 @@ const CreateOrEditTest = ({ testId }) => {
                   ))}
                 </Select>
               </FormControl>
-              <FormControlLabel
-                control={
-                  <Switch
-                    onChange={(event) =>
-                      setFieldValue("showExpectedAnswer", event.target.checked)
-                    }
-                    value={values.showExpectedAnswer}
-                  />
-                }
-                label="Show Expected Answer"
+              <FieldArray
+                name="pairs"
+                render={(arrayHelpers) => (
+                  <>
+                    {values.pairs &&
+                      values.pairs.map((val, index) => (
+                        <FormControl sx={{ marginY: 1 }}>
+                          <InputLabel>
+                            Pair of related questions ({index + 1})
+                          </InputLabel>
+                          <Select
+                            label="Questions"
+                            name={`pairs.${index}`}
+                            onChange={(event, child) => {
+                              if (val.length <= 2) {
+                                handleChange(event, child);
+                              }
+                            }}
+                            disabled={
+                              values.questions.length === 0 || val.length === 2
+                            }
+                            multiple
+                            value={values.pairs[index]}
+                            renderValue={(selected) => (
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  gap: 0.5,
+                                }}
+                              >
+                                {selected.map((value) => (
+                                  <Chip key={value} label={value} />
+                                ))}
+                              </Box>
+                            )}
+                            endAdornment={
+                              <>
+                                <Fab
+                                  color="primary"
+                                  size="small"
+                                  onClick={() => arrayHelpers.remove(index)}
+                                  disabled={values.pairs.length === 1}
+                                >
+                                  <HorizontalRuleIcon />
+                                </Fab>
+                                {index === values.pairs.length - 1 && (
+                                  <Fab
+                                    size="small"
+                                    color="primary"
+                                    sx={{ marginLeft: 1 }}
+                                    onClick={() => {
+                                      arrayHelpers.push([]);
+                                    }}
+                                    disabled={
+                                      values.pairs.at(-1).length !== 2 &&
+                                      values.questions.filter(
+                                        (q) => !values.pairs.flat().includes(q)
+                                      ).length > 1
+                                    }
+                                  >
+                                    <AddIcon />
+                                  </Fab>
+                                )}
+                              </>
+                            }
+                            IconComponent={null}
+                          >
+                            {values.questions
+                              .filter((q) => !values.pairs.flat().includes(q))
+                              .map((question) => (
+                                <MenuItem value={question} key={question}>
+                                  {question}
+                                </MenuItem>
+                              ))}
+                          </Select>
+                          {/* {!values.pairs ||
+                            (values.pairs && values.pairs.length === 0 && (
+                              <Button
+                                onClick={() => {
+                                  arrayHelpers.push("");
+                                }}
+                                variant="contained"
+                                sx={{ marginY: 1 }}
+                              >
+                                add pair of similar questions
+                              </Button>
+                            ))} */}
+                        </FormControl>
+                      ))}
+                  </>
+                )}
               />
               <Button
                 onClick={handleSubmit}

@@ -71,16 +71,6 @@ const Test = () => {
               </Typography>
             );
           })}
-          <Typography
-            color={theme.palette.primary.main}
-            variant="h5"
-            marginTop={6}
-          >
-            Show Expected Answer
-          </Typography>
-          <Typography color={theme.palette.primary.main} variant="body1">
-            {test.showExpectedAnswer ? "True" : "False"}
-          </Typography>
         </Box>
       </SpaceBetweenBox>
       <Box display="flex" flexDirection="row" columnGap={10} marginTop={10}>

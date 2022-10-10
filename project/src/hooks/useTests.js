@@ -45,8 +45,9 @@ export default function useTests() {
       instructionsPage: values.instructionsPage,
       demographicQuestions: values.demographicQuestions,
       questions: values.questions,
-      showExpectedAnswer: values.showExpectedAnswer,
+      showExpectedAnswer: false,
       creator: user.email,
+      pairs: values.pairs,
     })
       .then(() => {
         console.log("Test created!");
@@ -62,7 +63,8 @@ export default function useTests() {
       instructionsPage: values.instructionsPage,
       demographicQuestions: values.demographicQuestions,
       questions: values.questions,
-      showExpectedAnswer: values.showExpectedAnswer,
+      showExpectedAnswer: false,
+      pairs: values.pairs,
     })
       .then(() => {
         console.log("Test updated!");

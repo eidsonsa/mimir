@@ -7,17 +7,18 @@ import useQuestions from "../../hooks/useQuestions";
 import CodeImage from "../../components/CodeImage";
 import logo from "../../assets/logo.png";
 import useSubmitAnswer from "../../hooks/useSubmitAnswer";
+import useOrderQuestions from "../../hooks/useOrderQuestions";
 
 const TestSubmission = () => {
   const theme = useTheme();
 
   const { testId } = useParams();
   const { test } = useGetTest(testId);
+  const { orderedQuestions } = useOrderQuestions(test);
 
   const [page, setPage] = useState(0);
   const [demographicAnswers, setDemographicAnswers] = useState();
   const [testAnswers, setTestAnswers] = useState();
-  const [randomQuestions, setRandomQuestions] = useState();
   const [actualQuestion, setActualQuestion] = useState();
   const [startTime, setStartTime] = useState();
   const [exitScreen, setExitScreen] = useState(false);
@@ -29,25 +30,14 @@ const TestSubmission = () => {
   const { submitAnswer } = useSubmitAnswer();
 
   useEffect(() => {
-    if (test) {
-      setRandomQuestions(
-        test.questions
-          .map((value) => ({ value, sort: Math.random() }))
-          .sort((a, b) => a.sort - b.sort)
-          .map(({ value }) => value)
-      );
-    }
-  }, [test]);
-
-  useEffect(() => {
     if (page >= 2 && page <= lastPage) {
       setActualQuestion(
         questionsList.find(
-          (question) => question.id === randomQuestions[page - 2]
+          (question) => question.id === orderedQuestions[page - 2]
         ).data
       );
     }
-  }, [page, questionsList, randomQuestions]);
+  }, [page, questionsList, orderedQuestions]);
 
   if (!test || !questionsList) {
     return <Typography>Loading</Typography>;
@@ -86,11 +76,7 @@ const TestSubmission = () => {
   };
 
   const handleClick = () => {
-    if (page === 0 && !!test.demographicQuestions) {
-      setPage(page + 1);
-      setStartTime(Date.now());
-    }
-    if (page === 1) {
+    if (page === 1 || (page === 0 && test.demographicQuestions.length === 0)) {
       setStartTime(Date.now());
     }
     if (page > 1 && page !== lastPage) {
@@ -108,7 +94,7 @@ const TestSubmission = () => {
         Object.keys(demographicAnswers).length !==
           test.demographicQuestions.length
       : page > 1 && page <= lastPage
-      ? !!inputRef.current && inputRef.current.value === ""
+      ? inputRef.current && inputRef.current.value === ""
       : false;
 
   return (
@@ -123,6 +109,7 @@ const TestSubmission = () => {
           </Typography>
         ) : page === 1 ? (
           <>
+            {test.demographicQuestions.length === 0 && setPage(2)}
             {test.demographicQuestions.map((question) => {
               return (
                 <Box key={question} width={500}>

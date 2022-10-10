@@ -225,8 +225,9 @@ const CreateOrEditQuestion = ({ questionId }) => {
                     value={values.syntaxHighlighting || ""}
                   >
                     <MenuItem value="">None</MenuItem>
-                    <MenuItem value="python">Python</MenuItem>
+                    <MenuItem value="c">C</MenuItem>
                     <MenuItem value="javascript">Javascript</MenuItem>
+                    <MenuItem value="python">Python</MenuItem>
                   </Select>
                 </FormControl>
                 <FormControlLabel
