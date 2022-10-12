@@ -226,7 +226,7 @@ const CreateOrEditQuestion = ({ questionId }) => {
                   >
                     <MenuItem value="">None</MenuItem>
                     <MenuItem value="c">C</MenuItem>
-                    <MenuItem value="javascript">Javascript</MenuItem>
+                    <MenuItem value="java">Java</MenuItem>
                     <MenuItem value="python">Python</MenuItem>
                   </Select>
                 </FormControl>

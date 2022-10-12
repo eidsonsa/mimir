@@ -38,6 +38,8 @@ const Test = () => {
     test.questions.includes(quest.id)
   );
 
+  console.log(test.instructionsPage);
+
   return (
     <PageContainer>
       <Typography color={theme.palette.primary.main} variant="h4">
@@ -49,7 +51,11 @@ const Test = () => {
           <Typography color={theme.palette.primary.main} variant="h5">
             Instructions Page
           </Typography>
-          <Typography color={theme.palette.primary.main} variant="body1">
+          <Typography
+            color={theme.palette.primary.main}
+            variant="body1"
+            sx={{ whiteSpace: "pre-line" }}
+          >
             {test.instructionsPage}
           </Typography>
           <Typography

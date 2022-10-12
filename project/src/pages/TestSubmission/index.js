@@ -102,9 +102,13 @@ const TestSubmission = () => {
       <Typography color={theme.palette.primary.main} variant="h4">
         {test.title}
       </Typography>
-      <Box marginTop={8} maxWidth="60%" textAlign="center">
+      <Box marginTop={8}>
         {page === 0 ? (
-          <Typography variant="h5" textAlign="left">
+          <Typography
+            variant="h5"
+            textAlign="left"
+            sx={{ whiteSpace: "pre-line" }}
+          >
             {test.instructionsPage}
           </Typography>
         ) : page === 1 ? (
@@ -163,14 +167,17 @@ const TestSubmission = () => {
           </>
         )}
         {page <= lastPage && (
-          <Button
-            onClick={handleClick}
-            variant="contained"
-            sx={{ borderRadius: 20, width: 200, marginTop: 5 }}
-            disabled={isDisabled}
-          >
-            {page === lastPage ? "Submit" : "Next"}
-          </Button>
+          <Box textAlign="center">
+            <Button
+              onClick={handleClick}
+              variant="contained"
+              sx={{ borderRadius: 20, width: 200, marginTop: 5 }}
+              disabled={isDisabled}
+              fullWidth
+            >
+              {page === lastPage ? "Submit" : "Next"}
+            </Button>
+          </Box>
         )}
       </Box>
     </PageContainer>
